@@ -1,0 +1,38 @@
+<div class="auth-container">
+  <div class="auth-card">
+    <div class="auth-header">
+      <h2>Create an Account</h2>
+      <p>Sign up to get started.</p>
+    </div>
+
+    <form [formGroup]="registerForm" (ngSubmit)="onSubmit()">
+      <div class="form-group">
+        <label for="name">Full Name</label>
+        <input type="text" id="name" formControlName="name" class="form-control" placeholder="John Doe">
+        <div class="error" *ngIf="registerForm.get('name')?.invalid && (registerForm.get('name')?.dirty || registerForm.get('name')?.touched)">Name is required.</div>
+      </div>
+
+      <div class="form-group">
+        <label for="email">Email Address</label>
+        <input type="email" id="email" formControlName="email" class="form-control" placeholder="john@example.com">
+        <div class="error" *ngIf="registerForm.get('email')?.invalid && (registerForm.get('email')?.dirty || registerForm.get('email')?.touched)">Valid email is required.</div>
+      </div>
+
+      <div class="form-group">
+        <label for="password">Password</label>
+        <input type="password" id="password" formControlName="password" class="form-control" placeholder="••••••••">
+        <div class="error" *ngIf="registerForm.get('password')?.invalid && (registerForm.get('password')?.dirty || registerForm.get('password')?.touched)">Password must be at least 6 characters.</div>
+      </div>
+
+      <div class="alert success" *ngIf="successMessage">{{ successMessage }}</div>
+
+      <button type="submit" class="btn btn-primary" [disabled]="registerForm.invalid || isSubmitting">
+        {{ isSubmitting ? 'Registering...' : 'Register' }}
+      </button>
+    </form>
+
+    <div class="auth-footer">
+      <p>Already have an account? <a routerLink="/accounts/login">Log in here</a></p>
+    </div>
+  </div>
+</div>

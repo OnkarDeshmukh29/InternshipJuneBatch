@@ -1,0 +1,133 @@
+<div class="user-container">
+
+  <!-- List View -->
+  <ng-container *ngIf="viewMode === 'list'">
+    <div class="header-section list-header">
+      <div>
+        <h2>User Management</h2>
+        <p>Manage application users</p>
+      </div>
+      <button class="btn btn-primary" (click)="showForm()">+ Add User</button>
+    </div>
+
+    <div class="alert error" *ngIf="error">{{ error }} (Showing mock data instead)</div>
+
+    <div class="table-responsive">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>First Name</th>
+            <th>Last Name</th>
+            <th>Email</th>
+            <th>Role</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <ng-container *ngIf="!isLoading; else loading">
+            <tr *ngFor="let user of users">
+
+              <!-- {
+                id:1,
+                firstName: 'Jane',
+                lastName: 'Doe', 
+                email:'jane.doe@example.com'
+
+              } -->
+
+                 <!-- {
+                id:1,
+                firstName: 'Jane',
+                lastName: 'Doe', 
+                email:'jane.doe@example.com'
+
+              } -->
+                
+              <td>{{ user?.id }}</td>
+              <td>{{ user?.firstName }}</td>
+              <td>{{ user?.lastName }}</td>
+              <td>{{ user?.email }}</td>
+              <td><span class="badge" [ngClass]="user.role === 'Admin' ? 'badge-emerald' : 'badge-blue'">{{ user.role }}</span></td>
+              <td>
+                <span class="status-indicator" [ngClass]="{'active': user.status === 'Active'}"></span>
+                {{ user?.status }}
+              </td>
+              <td class="actions-cell">
+                <button class="btn-icon btn-edit" (click)="showForm(user)" title="Edit">✏️</button>
+                <button class="btn-icon btn-delete" (click)="deleteUser(user.id)" title="Delete">🗑️</button>
+              </td>
+            </tr>
+            <tr *ngIf="users.length === 0">
+              <td colspan="7" class="empty-state">No users found.</td>
+            </tr>
+          </ng-container>
+          <ng-template #loading>
+            <tr>
+              <td colspan="7" class="loading-state">Loading users...</td>
+            </tr>
+          </ng-template>
+        </tbody>
+      </table>
+    </div>
+  </ng-container>
+
+  <!-- Form View -->
+  <ng-container *ngIf="viewMode === 'form'">
+    <div class="header-section form-header">
+      <button class="btn-back" (click)="showList()">← Back to List</button>
+      <h2>{{ editingUserId ? 'Edit User' : 'User Registration' }}</h2>
+      <p>Enter user details below</p>
+    </div>
+
+    <div class="form-card">
+      <form [formGroup]="userForm" (ngSubmit)="onSubmit()">
+        <div class="form-row">
+          <div class="form-group half">
+            <label for="firstName">First Name</label>
+            <input type="text" id="firstName" formControlName="firstName" class="form-control">
+            <div class="error" *ngIf="userForm.get('firstName')?.invalid && (userForm.get('firstName')?.dirty || userForm.get('firstName')?.touched)">Required.</div>
+          </div>
+
+          <div class="form-group half">
+            <label for="lastName">Last Name</label>
+            <input type="text" id="lastName" formControlName="lastName" class="form-control">
+            <div class="error" *ngIf="userForm.get('lastName')?.invalid && (userForm.get('lastName')?.dirty || userForm.get('lastName')?.touched)">Required.</div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="email">Email Address</label>
+          <input type="email" id="email" formControlName="email" class="form-control">
+          <div class="error" *ngIf="userForm.get('email')?.invalid && (userForm.get('email')?.dirty || userForm.get('email')?.touched)">Valid email required.</div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group half">
+            <label for="role">Role</label>
+            <select id="role" formControlName="role" class="form-control">
+              <option value="Admin">Admin</option>
+              <option value="User">User</option>
+            </select>
+          </div>
+
+          <div class="form-group half">
+            <label for="status">Status</label>
+            <select id="status" formControlName="status" class="form-control">
+              <option value="Active">Active</option>
+              <option value="Inactive">Inactive</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="alert success" *ngIf="successMessage">{{ successMessage }}</div>
+
+        <button type="submit" class="btn btn-primary" [disabled]="userForm.invalid || isSubmitting">
+          {{ isSubmitting ? 'Saving...' : (editingUserId ? 'Update User' : 'Register User') }}
+        </button>
+      </form>
+    </div>
+  </ng-container>
+
+</div>

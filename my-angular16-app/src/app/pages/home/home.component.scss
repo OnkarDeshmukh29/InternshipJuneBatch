@@ -1,0 +1,198 @@
+.home-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 40px 20px;
+}
+
+.hero {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 40px;
+  margin-bottom: 80px;
+  min-height: 60vh;
+
+  .hero-content {
+    flex: 1;
+
+    .title {
+      font-size: 3.5rem;
+      font-weight: 800;
+      color: var(--dark);
+      margin-bottom: 20px;
+      line-height: 1.2;
+
+      .highlight {
+        color: var(--primary);
+        background: linear-gradient(135deg, var(--primary), var(--secondary));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+      }
+    }
+
+    .subtitle {
+      font-size: 1.15rem;
+      color: var(--text-muted);
+      margin-bottom: 32px;
+      max-width: 500px;
+    }
+
+    .cta-group {
+      display: flex;
+      gap: 16px;
+
+      .btn {
+        padding: 12px 28px;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 1rem;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        border: none;
+
+        &-primary {
+          background-color: var(--primary);
+          color: var(--white);
+          box-shadow: 0 4px 14px 0 rgba(79, 70, 229, 0.39);
+
+          &:hover {
+            background-color: var(--primary-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(79, 70, 229, 0.4);
+          }
+        }
+
+        &-secondary {
+          background-color: var(--white);
+          color: var(--dark);
+          border: 1px solid var(--gray-200);
+
+          &:hover {
+            border-color: var(--dark);
+            background-color: var(--gray-200);
+          }
+        }
+      }
+    }
+  }
+
+  .hero-image {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+
+    .mockup-window {
+      width: 100%;
+      max-width: 450px;
+      background: var(--white);
+      border-radius: 12px;
+      box-shadow: var(--shadow-md);
+      overflow: hidden;
+      border: 1px solid var(--gray-200);
+      transform: perspective(1000px) rotateY(-5deg) rotateX(5deg);
+      transition: transform 0.5s ease;
+
+      &:hover {
+        transform: perspective(1000px) rotateY(0deg) rotateX(0deg);
+      }
+
+      .window-header {
+        background: var(--light);
+        padding: 12px;
+        border-bottom: 1px solid var(--gray-200);
+        display: flex;
+        gap: 6px;
+
+        .dot {
+          width: 10px;
+          height: 10px;
+          border-radius: 50%;
+          background: #E5E7EB;
+
+          &:nth-child(1) { background: #FF5F56; }
+          &:nth-child(2) { background: #FFBD2E; }
+          &:nth-child(3) { background: #27C93F; }
+        }
+      }
+
+      .window-body {
+        padding: 24px;
+        
+        .skeleton-line {
+          height: 16px;
+          background: var(--gray-200);
+          border-radius: 4px;
+          margin-bottom: 12px;
+
+          &.short { width: 60%; }
+        }
+
+        .skeleton-block {
+          height: 120px;
+          background: var(--light);
+          border-radius: 8px;
+          margin-top: 24px;
+        }
+      }
+    }
+  }
+}
+
+.features {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 30px;
+
+  .feature-card {
+    background: var(--white);
+    padding: 30px;
+    border-radius: 16px;
+    box-shadow: var(--shadow-sm);
+    border: 1px solid var(--gray-200);
+    transition: all 0.3s ease;
+
+    &:hover {
+      transform: translateY(-5px);
+      box-shadow: var(--shadow-md);
+    }
+
+    .icon {
+      font-size: 2.5rem;
+      margin-bottom: 20px;
+      background: var(--light);
+      width: 60px;
+      height: 60px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 12px;
+    }
+
+    h3 {
+      font-size: 1.25rem;
+      color: var(--dark);
+      margin-bottom: 12px;
+    }
+
+    p {
+      color: var(--text-muted);
+      font-size: 0.95rem;
+      line-height: 1.5;
+    }
+  }
+}
+
+@media (max-width: 900px) {
+  .hero {
+    flex-direction: column;
+    text-align: center;
+
+    .hero-content .subtitle {
+      margin: 0 auto 32px;
+    }
+
+    .cta-group {
+      justify-content: center;
+    }
+  }
+}

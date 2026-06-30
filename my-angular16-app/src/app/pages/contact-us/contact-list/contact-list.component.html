@@ -1,0 +1,47 @@
+<div class="contact-list-container">
+  <div class="list-header">
+    <h3>Recent Contact Messages</h3>
+    <button class="btn btn-primary" (click)="onAdd.emit()">+ Add New</button>
+  </div>
+  
+  <div class="alert error" *ngIf="error">{{ error }} (Showing mock data instead)</div>
+  
+  <div class="table-responsive">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Name</th>
+          <th>Email</th>
+          <th>Subject</th>
+          <th>Message</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <ng-container *ngIf="!isLoading; else loading">
+          <tr *ngFor="let msg of messages">
+            <td>{{ msg.id || '-' }}</td>
+            <td>{{ msg.name }}</td>
+            <td>{{ msg.email }}</td>
+            <td>{{ msg.subject }}</td>
+            <td class="message-cell">{{ msg.message }}</td>
+            <td class="actions-cell">
+              <button class="btn-icon btn-edit" (click)="onEdit.emit(msg)" title="Edit">✏️</button>
+              <button class="btn-icon btn-delete" (click)="deleteMessage(msg.id)" title="Delete">🗑️</button>
+            </td>
+          </tr>
+          <tr *ngIf="messages.length === 0">
+            <td colspan="6" class="empty-state">No messages found.</td>
+          </tr>
+        </ng-container>
+        
+        <ng-template #loading>
+          <tr>
+            <td colspan="6" class="loading-state">Loading messages...</td>
+          </tr>
+        </ng-template>
+      </tbody>
+    </table>
+  </div>
+</div>
