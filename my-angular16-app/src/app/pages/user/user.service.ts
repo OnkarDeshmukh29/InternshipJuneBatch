@@ -16,9 +16,9 @@ export interface User {
   providedIn: 'root'
 })
 export class UserService {
-  // private apiUrl = `${environment.apiUrl}/users`;
+  private apiUrl = `${environment.apiUrl}/users`;
 
-  private apiUrl = 'https://localhost:8000/api/users/'; // Use the apiUrl from the environment configuration
+  // private apiUrl = 'https://localhost:8000/api/users/'; // Use the apiUrl from the environment configuration
 
   constructor(private http: HttpClient) { }
 

@@ -22,6 +22,7 @@ export class AuthService {
   }
 
   login(credentials: any): Observable<any> {
+    console.log('AuthService: Sending login request with credentials:', credentials);
     return this.http.post<any>(`${this.apiUrl}/login`, credentials).pipe(
       tap(response => {
         // Save token to localStorage upon successful login
