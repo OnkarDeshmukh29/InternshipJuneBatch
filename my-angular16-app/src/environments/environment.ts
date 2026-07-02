@@ -1,6 +1,6 @@
 export const environment = {
   production: false,
-  apiUrl: 'https://localhost:8000/api', // Development URL
+  apiUrl: ' http://127.0.0.1:8000/', // Development URL
 
   // apiUrl:'https://amazon.in/api'
 };

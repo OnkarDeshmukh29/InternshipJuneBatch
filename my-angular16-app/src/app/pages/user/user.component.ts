@@ -20,6 +20,7 @@ export class UserComponent implements OnInit {
   isSubmitting = false;
   editingUserId: string | number | null = null;
   successMessage = '';
+  selectedFile: File | null = null;
 
   constructor(
     private userService: UserService,
@@ -60,9 +61,9 @@ export class UserComponent implements OnInit {
   }
 
   showForm(user?: User): void {
-    console.log('showForm called with user:', user);
     this.viewMode = 'form';
     this.successMessage = '';
+    this.selectedFile = null;
     
     if (user) {
       this.editingUserId = user.id as string | number;
@@ -77,12 +78,30 @@ export class UserComponent implements OnInit {
     this.viewMode = 'list';
   }
 
+  onFileChange(event: any): void {
+    const file = event.target.files[0];
+    if (file) {
+      this.selectedFile = file;
+    }
+  }
+
   onSubmit(): void {
     if (this.userForm.invalid) return;
 
     this.isSubmitting = true;
     this.successMessage = '';
-    const formData = this.userForm.value;
+    
+    // Create FormData instead of a standard JSON object to handle file upload
+    const formData = new FormData();
+    const formValues = this.userForm.value;
+    
+    Object.keys(formValues).forEach(key => {
+      formData.append(key, formValues[key]);
+    });
+
+    if (this.selectedFile) {
+      formData.append('profileImage', this.selectedFile);
+    }
 
     const request$ = this.editingUserId
       ? this.userService.updateUser(this.editingUserId, formData)
@@ -91,22 +110,23 @@ export class UserComponent implements OnInit {
     request$.pipe(
       catchError(err => {
         // Mock success even if API fails for demonstration
-        return of(formData);
+        return of(formValues);
       })
     ).subscribe(() => {
       this.isSubmitting = false;
       this.successMessage = this.editingUserId ? 'User updated successfully!' : 'User registered successfully!';
       
-      // Update local array for demonstration
+      // Update local array for demonstration using the form values
       if (this.editingUserId) {
         const index = this.users.findIndex(u => u.id === this.editingUserId);
         if (index !== -1) {
-          this.users[index] = { ...this.users[index], ...formData };
+          this.users[index] = { ...this.users[index], ...formValues };
         }
       } else {
-        this.users.push({ id: Math.floor(Math.random() * 1000), ...formData });
+        this.users.push({ id: Math.floor(Math.random() * 1000), ...formValues });
       }
 
+      this.selectedFile = null;
       setTimeout(() => this.showList(), 1500);
     });
   }
