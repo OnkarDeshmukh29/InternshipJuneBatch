@@ -25,6 +25,7 @@
       </div>
 
       <div class="alert success" *ngIf="successMessage">{{ successMessage }}</div>
+      <div class="alert error" *ngIf="errorMessage">{{ errorMessage }}</div>
 
       <button type="submit" class="btn btn-primary" [disabled]="registerForm.invalid || isSubmitting">
         {{ isSubmitting ? 'Registering...' : 'Register' }}

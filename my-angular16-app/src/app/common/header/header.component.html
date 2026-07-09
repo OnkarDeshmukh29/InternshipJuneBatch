@@ -12,7 +12,8 @@
     </nav>
     
     <div class="actions">
-      <a routerLink="/accounts/login" class="btn btn-primary">Login / Register</a>
+      <a *ngIf="!authService.isLoggedIn()" routerLink="/accounts/login" class="btn btn-primary">Login / Register</a>
+      <button *ngIf="authService.isLoggedIn()" (click)="onLogout()" class="btn btn-primary" style="background: #e74c3c;">Logout</button>
     </div>
   </div>
 </header>

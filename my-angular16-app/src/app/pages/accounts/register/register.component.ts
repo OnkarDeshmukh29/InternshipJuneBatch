@@ -12,6 +12,7 @@ export class RegisterComponent implements OnInit {
   registerForm!: FormGroup;
   isSubmitting = false;
   successMessage = '';
+  errorMessage = '';
 
   constructor(
     private fb: FormBuilder,
@@ -31,6 +32,8 @@ export class RegisterComponent implements OnInit {
     if (this.registerForm.invalid) return;
 
     this.isSubmitting = true;
+    this.successMessage = '';
+    this.errorMessage = '';
     const userData = this.registerForm.value;
 
     this.authService.register(userData).subscribe({
@@ -43,9 +46,12 @@ export class RegisterComponent implements OnInit {
         this.isSubmitting = false;
         console.error('Registration error:', err);
         
-        // --- Fallback logic since api.example.com is a mock API ---
-        this.successMessage = 'Registration successful! Redirecting to login...';
-        setTimeout(() => this.router.navigate(['/accounts/login']), 1500);
+        // Safely extract the exact error message from Django if it exists
+        if (err.error && typeof err.error === 'object') {
+           this.errorMessage = Object.values(err.error).flat().join(' ');
+        } else {
+           this.errorMessage = 'Registration failed. Please try again.';
+        }
       }
     });
   }

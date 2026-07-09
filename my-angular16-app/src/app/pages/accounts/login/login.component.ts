@@ -43,10 +43,12 @@ export class LoginComponent implements OnInit {
         this.isSubmitting = false;
         console.error('Login error:', err);
         
-        // --- Fallback logic since api.example.com is a mock API ---
-        // In a real app, you would just do: this.errorMessage = 'Invalid email or password';
-        localStorage.setItem('auth_token', 'mock_jwt_token_12345');
-        this.router.navigate(['/home']);
+        // Safely extract the exact error message from Django if it exists
+        if (err.error && err.error.error) {
+           this.errorMessage = err.error.error;
+        } else {
+           this.errorMessage = 'Invalid email or password.';
+        }
       }
     });
   }

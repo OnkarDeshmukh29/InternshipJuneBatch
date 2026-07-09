@@ -8,7 +8,7 @@ import { environment } from '../../../environments/environment';
   providedIn: 'root'
 })
 export class AuthService {
-  private apiUrl = `${environment.apiUrl}/auth`;
+  private apiUrl = `${environment.apiUrl}/users`;
   private readonly TOKEN_KEY = 'auth_token';
 
   constructor(private http: HttpClient) { }
@@ -36,6 +36,8 @@ export class AuthService {
   register(userData: any): Observable<any> {
     return this.http.post<any>(`${this.apiUrl}/register`, userData);
   }
+
+  // http://localhost:8000/api/users/register
 
   logout(): void {
     // Remove token from localStorage on logout
