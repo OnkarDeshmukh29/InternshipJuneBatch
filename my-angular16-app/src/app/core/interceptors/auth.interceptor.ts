@@ -17,8 +17,9 @@ export class AuthInterceptor implements HttpInterceptor {
   constructor(private authService: AuthService, private router: Router) {}
 
   intercept(request: HttpRequest<unknown>, next: HttpHandler): Observable<HttpEvent<unknown>> {
-    // 1. Get the token from AuthService
-    const token = this.authService.getToken();
+    // 1. Get the access token from AuthService
+    const token = this.authService.getAccessToken();
+    console.log("token", token);
 
     // 2. Clone the request and add the Authorization header if the token exists
     if (token) {

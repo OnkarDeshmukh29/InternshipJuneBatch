@@ -4,14 +4,20 @@ from rest_framework.response import Response
 from django.contrib.auth import authenticate, login
 from .models import CustomUser, Role
 from .serializers import UserSerializer, RoleSerializer
+from rest_framework_simplejwt.tokens import RefreshToken
 
 from django.http import Http404
+
+from rest_framework.permissions import IsAuthenticated, IsAdminUser
 
 class UserListCreateView(APIView):
     """
     Explicitly showing GET and POST methods instead of using generics.
     Great for teaching how HTTP methods map to Python functions.
     """
+    # Protect this endpoint: Requires a valid JWT token AND the user must be a super admin (is_staff=True)
+    permission_classes = [IsAuthenticated, IsAdminUser]
+
     def get(self, request):
         # 1. Get all users from the database
         users = CustomUser.objects.all()
@@ -78,19 +84,31 @@ class RegisterView(APIView):
             return Response({'message': 'Registration successful'}, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+
 class LoginView(APIView):
     def post(self, request):
         email = request.data.get('email')
+        print(f"Login attempt for email: {email}")  # Debugging line
+        # deshmukhonkar29@gmail.com
+        mobile = request.data.get('mobile')
+        print(f"Login attempt for mobile: {mobile}")  # Debugging line  
         password = request.data.get('password')
                 
         # Since USERNAME_FIELD is 'email', we authenticate using email
-        user = authenticate(request, email=email, password=password)
+        user = authenticate(request, email=email,mobile=mobile, password=password)
+                # deshmukhonkar29@gmail.com=deshmukhnkar29@gmail.com
         
         if user is not None:
             login(request, user)
-            # Return a token to match angular's expectation
+            
+            # Generate JWT Tokens
+            refresh = RefreshToken.for_user(user)
+            print("refresh", refresh)
+            
+            # Return both tokens and the user data to match Angular's new expectation
             return Response({
-                'token': f'django_auth_token_{user.id}',
+                'access_token': str(refresh.access_token),
+                'refresh_token': str(refresh),
                 'user': UserSerializer(user).data
             })
         return Response({'error': 'Invalid credentials'}, status=status.HTTP_401_UNAUTHORIZED)
