@@ -10,6 +10,8 @@ from django.http import Http404
 
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
 
+from django.db.models import Q
+
 class UserListCreateView(APIView):
     """
     Explicitly showing GET and POST methods instead of using generics.
@@ -21,9 +23,26 @@ class UserListCreateView(APIView):
     def get(self, request):
         # 1. Get all users from the database
         users = CustomUser.objects.all()
-        # 2. Convert complex model instances into JSON using the serializer (many=True for lists)
+        
+        # 2. Extract the search and status query parameters from the URL
+        search_query = request.query_params.get('search', None)
+        status_query = request.query_params.get('status', None)
+        # status_query = Active  # Normalize to lowercase for case-insensitive comparison
+        
+        if search_query:
+            # 3. Filter using Q objects for OR logic
+            users = users.filter(
+                Q(firstName__icontains=search_query) |
+                Q(lastName__icontains=search_query) |
+                Q(email__icontains=search_query)
+            )
+            
+        if status_query:
+            users = users.filter(status__iexact=status_query)
+            
+        # 4. Convert complex model instances into JSON using the serializer (many=True for lists)
         serializer = UserSerializer(users, many=True)
-        # 3. Return the JSON response
+        # 5. Return the JSON response
         return Response(serializer.data)
 
     def post(self, request):

@@ -10,6 +10,22 @@
       <button class="btn btn-primary" (click)="showForm()">+ Add User</button>
     </div>
 
+    <!-- Search Section -->
+    <div class="search-section" style="margin-bottom: 20px; display: flex; gap: 10px; align-items: center;">
+      <div class="search-input-wrapper" style="position: relative; flex-grow: 1; max-width: 400px;">
+        <input type="text" [(ngModel)]="searchTerm" (keyup.enter)="onSearch()" placeholder="Search users by name or email..." class="form-control" style="padding-left: 35px; width: 100%;">
+        <span style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: #888;">🔍</span>
+      </div>
+      
+      <select [(ngModel)]="searchStatus" (change)="onFilterStatus()" class="form-control" style="width: 150px; cursor: pointer;">
+        <option value="">All Statuses</option>
+        <option value="Active">Active</option>
+        <option value="Inactive">Inactive</option>
+      </select>
+
+      <button class="btn btn-secondary" (click)="onSearch()" style="padding: 0.5rem 1.5rem; border: 1px solid #ddd; background: white; border-radius: 6px; cursor: pointer; font-weight: 500;">Search</button>
+    </div>
+
     <div class="alert error" *ngIf="error">{{ error }} (Showing mock data instead)</div>
 
     <div class="table-responsive">

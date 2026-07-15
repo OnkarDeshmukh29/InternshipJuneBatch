@@ -15,6 +15,8 @@ export class UserComponent implements OnInit {
   users: User[] = [];
   isLoading = false;
   error = '';
+  searchTerm = '';
+  searchStatus = '';
   
   userForm!: FormGroup;
   isSubmitting = false;
@@ -40,7 +42,7 @@ export class UserComponent implements OnInit {
 
   loadUsers(): void {
     this.isLoading = true;
-    this.userService.getUsers().pipe(
+    this.userService.getUsers(this.searchTerm, this.searchStatus).pipe(
       catchError(err => {
         console.error('Error fetching users', err);
         this.error = 'Failed to load users from the server.';
@@ -58,6 +60,14 @@ export class UserComponent implements OnInit {
       console.log('Users loaded:', this.users);
       this.isLoading = false;
     });
+  }
+
+  onSearch(): void {
+    this.loadUsers();
+  }
+
+  onFilterStatus(): void {
+    this.loadUsers();
   }
 
   showForm(user?: User): void {
