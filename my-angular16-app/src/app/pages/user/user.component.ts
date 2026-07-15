@@ -52,7 +52,6 @@ export class UserComponent implements OnInit {
           { id: 2, firstName: 'John', lastName: 'Smith', email: 'john.smith@example.com', role: 'User', status: 'Inactive' },
           { id: 3, firstName: 'John', lastName: 'Smith', email: 'john.smith@example.com', role: 'User', status: 'Inactive' },
           { id: 4, firstName: 'John', lastName: 'Smith', email: 'john.smith@example.com', role: 'User', status: 'Inactive' }
-
         ]);
       })
     ).subscribe(data => {

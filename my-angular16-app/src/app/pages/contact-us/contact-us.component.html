@@ -1,104 +1,48 @@
-<div class="contact-container">
+<div class="contact-container" style="max-width: 800px; margin: 40px auto; padding: 0 20px;">
   
-  <!-- List View -->
-  <ng-container *ngIf="viewMode === 'list'">
-    <div class="header-section">
-      <h2>Contact Messages</h2>
-      <p>Manage your contact messages and forms</p>
-    </div>
-    <app-contact-list (onAdd)="showForm()" (onEdit)="showForm($event)"></app-contact-list>
-  </ng-container>
+  <div class="header-section form-header" style="text-align: center; margin-bottom: 40px;">
+    <h2>Contact Us</h2>
+    <p>How can we help you today? Fill out the form below.</p>
+  </div>
 
-  <!-- Form View -->
-  <ng-container *ngIf="viewMode === 'form'">
-    <div class="header-section form-header">
-      <button class="btn-back" (click)="showList()">← Back to List</button>
-      <h2>{{ editingMessage ? 'Edit Contact Message' : 'Create Contact Message' }}</h2>
-      <p>This page demonstrates two different approaches to building forms in Angular.</p>
-    </div>
-
-    <div class="forms-grid">
-      <!-- Template-Driven Form Section -->
-      <div class="form-card">
-        <div class="card-header">
-          <h3>Template-Driven Form</h3>
-          <span class="badge badge-blue">FormsModule</span>
-        </div>
-        <p class="description">Relies on directives in the HTML template to create and manage the form model.</p>
-        
-        <form #templateForm="ngForm" (ngSubmit)="onSubmitTemplate(templateForm)">
-          <div class="form-group">
-            <label for="t-name">Name</label>
-            <input type="text" id="t-name" name="name" [(ngModel)]="templateModel.name" required #tName="ngModel" class="form-control">
-            <div class="error" *ngIf="tName.invalid && (tName.dirty || tName.touched)">Name is required.</div>
-          </div>
-
-          <div class="form-group">
-            <label for="t-email">Email</label>
-            <input type="email" id="t-email" name="email" [(ngModel)]="templateModel.email" required email #tEmail="ngModel" class="form-control">
-            <div class="error" *ngIf="tEmail.invalid && (tEmail.dirty || tEmail.touched)">Valid email is required.</div>
-          </div>
-
-          <div class="form-group">
-            <label for="t-subject">Subject</label>
-            <input type="text" id="t-subject" name="subject" [(ngModel)]="templateModel.subject" required #tSubject="ngModel" class="form-control">
-            <div class="error" *ngIf="tSubject.invalid && (tSubject.dirty || tSubject.touched)">Subject is required.</div>
-          </div>
-
-          <div class="form-group">
-            <label for="t-message">Message</label>
-            <textarea id="t-message" name="message" rows="4" [(ngModel)]="templateModel.message" required minlength="10" #tMessage="ngModel" class="form-control"></textarea>
-            <div class="error" *ngIf="tMessage.invalid && (tMessage.dirty || tMessage.touched)">Message must be at least 10 characters.</div>
-          </div>
-
-          <div class="alert success" *ngIf="templateSuccess">{{ templateSuccess }}</div>
-
-          <button type="submit" class="btn btn-primary" [disabled]="templateForm.invalid || isTemplateSubmitting">
-            {{ isTemplateSubmitting ? 'Saving...' : (editingMessage ? 'Update (Template)' : 'Send (Template)') }}
-          </button>
-        </form>
+  <div class="form-card" style="background: white; padding: 40px; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.05);">
+    <form [formGroup]="reactiveForm" (ngSubmit)="onSubmitReactive()">
+      <div class="form-group" style="margin-bottom: 20px;">
+        <label for="r-name" style="display: block; margin-bottom: 8px; font-weight: 500;">Your Name</label>
+        <input type="text" id="r-name" formControlName="name" class="form-control" style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 6px;">
+        <div class="error" *ngIf="reactiveForm.get('name')?.invalid && (reactiveForm.get('name')?.dirty || reactiveForm.get('name')?.touched)" style="color: #dc3545; font-size: 0.85rem; margin-top: 5px;">Name is required.</div>
       </div>
 
-      <!-- Reactive Form Section -->
-      <div class="form-card">
-        <div class="card-header">
-          <h3>Reactive Form</h3>
-          <span class="badge badge-emerald">ReactiveFormsModule</span>
-        </div>
-        <p class="description">Provides direct, explicit access to the underlying form's object model in the component class.</p>
-        
-        <form [formGroup]="reactiveForm" (ngSubmit)="onSubmitReactive()">
-          <div class="form-group">
-            <label for="r-name">Name</label>
-            <input type="text" id="r-name" formControlName="name" class="form-control">
-            <div class="error" *ngIf="reactiveForm.get('name')?.invalid && (reactiveForm.get('name')?.dirty || reactiveForm.get('name')?.touched)">Name is required.</div>
-          </div>
-
-          <div class="form-group">
-            <label for="r-email">Email</label>
-            <input type="email" id="r-email" formControlName="email" class="form-control">
-            <div class="error" *ngIf="reactiveForm.get('email')?.invalid && (reactiveForm.get('email')?.dirty || reactiveForm.get('email')?.touched)">Valid email is required.</div>
-          </div>
-
-          <div class="form-group">
-            <label for="r-subject">Subject</label>
-            <input type="text" id="r-subject" formControlName="subject" class="form-control">
-            <div class="error" *ngIf="reactiveForm.get('subject')?.invalid && (reactiveForm.get('subject')?.dirty || reactiveForm.get('subject')?.touched)">Subject is required.</div>
-          </div>
-
-          <div class="form-group">
-            <label for="r-message">Message</label>
-            <textarea id="r-message" formControlName="message" rows="4" class="form-control"></textarea>
-            <div class="error" *ngIf="reactiveForm.get('message')?.invalid && (reactiveForm.get('message')?.dirty || reactiveForm.get('message')?.touched)">Message must be at least 10 characters.</div>
-          </div>
-
-          <div class="alert success" *ngIf="reactiveSuccess">{{ reactiveSuccess }}</div>
-
-          <button type="submit" class="btn btn-primary" [disabled]="reactiveForm.invalid || isReactiveSubmitting">
-            {{ isReactiveSubmitting ? 'Saving...' : (editingMessage ? 'Update (Reactive)' : 'Send (Reactive)') }}
-          </button>
-        </form>
+      <div class="form-group" style="margin-bottom: 20px;">
+        <label for="r-email" style="display: block; margin-bottom: 8px; font-weight: 500;">Email Address</label>
+        <input type="email" id="r-email" formControlName="email" class="form-control" style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 6px;">
+        <div class="error" *ngIf="reactiveForm.get('email')?.invalid && (reactiveForm.get('email')?.dirty || reactiveForm.get('email')?.touched)" style="color: #dc3545; font-size: 0.85rem; margin-top: 5px;">Valid email is required.</div>
       </div>
-    </div>
-  </ng-container>
+
+      <div class="form-group" style="margin-bottom: 20px;">
+        <label for="r-subject" style="display: block; margin-bottom: 8px; font-weight: 500;">Subject</label>
+        <input type="text" id="r-subject" formControlName="subject" class="form-control" style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 6px;">
+        <div class="error" *ngIf="reactiveForm.get('subject')?.invalid && (reactiveForm.get('subject')?.dirty || reactiveForm.get('subject')?.touched)" style="color: #dc3545; font-size: 0.85rem; margin-top: 5px;">Subject is required.</div>
+      </div>
+
+      <div class="form-group" style="margin-bottom: 20px;">
+        <label for="r-message" style="display: block; margin-bottom: 8px; font-weight: 500;">Message</label>
+        <textarea id="r-message" formControlName="message" rows="5" class="form-control" style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 6px; resize: vertical;"></textarea>
+        <div class="error" *ngIf="reactiveForm.get('message')?.invalid && (reactiveForm.get('message')?.dirty || reactiveForm.get('message')?.touched)" style="color: #dc3545; font-size: 0.85rem; margin-top: 5px;">Message must be at least 10 characters.</div>
+      </div>
+
+      <div class="form-group" style="margin-bottom: 30px;">
+        <label for="r-attachment" style="display: block; margin-bottom: 8px; font-weight: 500;">Attachment (Optional)</label>
+        <input type="file" id="r-attachment" (change)="onFileSelected($event)" class="form-control" style="width: 100%; padding: 10px; border: 1px dashed #ddd; border-radius: 6px; background: #fafafa;">
+      </div>
+
+      <div class="alert success" *ngIf="reactiveSuccess" style="background: #d4edda; color: #155724; padding: 15px; border-radius: 6px; margin-bottom: 20px;">{{ reactiveSuccess }}</div>
+      <div class="alert error" *ngIf="reactiveError" style="background: #f8d7da; color: #721c24; padding: 15px; border-radius: 6px; margin-bottom: 20px;">{{ reactiveError }}</div>
+
+      <button type="submit" class="btn btn-primary" [disabled]="reactiveForm.invalid || isReactiveSubmitting" style="width: 100%; padding: 14px; background: #6366f1; color: white; border: none; border-radius: 6px; font-weight: 600; font-size: 1rem; cursor: pointer;">
+        {{ isReactiveSubmitting ? 'Sending Message...' : 'Send Message' }}
+      </button>
+    </form>
+  </div>
+
 </div>

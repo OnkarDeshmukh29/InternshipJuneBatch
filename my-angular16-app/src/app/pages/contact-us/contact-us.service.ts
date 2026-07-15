@@ -29,9 +29,9 @@ export class ContactUsService {
     return this.http.get<ContactMessage>(`${this.apiUrl}/${id}`);
   }
 
-  // POST: Create a new message
-  createMessage(data: ContactMessage): Observable<ContactMessage> {
-    return this.http.post<ContactMessage>(this.apiUrl, data);
+  // POST: Create a new message (Updated to accept FormData for file uploads)
+  createMessage(data: FormData): Observable<any> {
+    return this.http.post<any>(this.apiUrl + '/', data);
   }
 
   // PUT: Update an existing message

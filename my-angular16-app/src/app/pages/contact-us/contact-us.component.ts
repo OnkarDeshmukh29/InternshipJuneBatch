@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { ContactUsService, ContactMessage } from './contact-us.service';
+import { ContactUsService } from './contact-us.service';
 
 @Component({
   selector: 'app-contact-us',
@@ -8,23 +8,11 @@ import { ContactUsService, ContactMessage } from './contact-us.service';
   styleUrls: ['./contact-us.component.scss']
 })
 export class ContactUsComponent implements OnInit {
-  viewMode: 'list' | 'form' = 'list';
-  editingMessage: ContactMessage | null = null;
-
-  // --- Template-Driven Form ---
-  templateModel: ContactMessage = {
-    name: '',
-    email: '',
-    subject: '',
-    message: ''
-  };
-  isTemplateSubmitting = false;
-  templateSuccess = '';
-
-  // --- Reactive Form ---
   reactiveForm!: FormGroup;
   isReactiveSubmitting = false;
   reactiveSuccess = '';
+  reactiveError = '';
+  selectedFile: File | null = null;
 
   constructor(
     private contactService: ContactUsService,
@@ -41,76 +29,50 @@ export class ContactUsComponent implements OnInit {
     });
   }
 
-  showForm(msg?: ContactMessage): void {
-    this.viewMode = 'form';
-    this.reactiveSuccess = '';
-    this.templateSuccess = '';
+  onFileSelected(event: any): void {
+    const file = event.target.files[0];
+    if (file) {
+      this.selectedFile = file;
+      console.log(this.selectedFile);
 
-    if (msg) {
-      this.editingMessage = msg;
-      this.reactiveForm.patchValue(msg);
-      // Optional: Patch template form too
-      this.templateModel = { ...msg };
-    } else {
-      this.editingMessage = null;
-      this.reactiveForm.reset();
-      this.templateModel = { name: '', email: '', subject: '', message: '' };
     }
   }
 
-  showList(): void {
-    this.viewMode = 'list';
-    this.editingMessage = null;
-  }
-
-  // Submit Template-Driven Form
-  onSubmitTemplate(form: any) {
-    if (form.invalid) return;
-
-    this.isTemplateSubmitting = true;
-    this.templateSuccess = '';
-
-    const request$ = this.editingMessage && this.editingMessage.id
-      ? this.contactService.updateMessage(this.editingMessage.id, this.templateModel)
-      : this.contactService.createMessage(this.templateModel);
-
-    request$.subscribe({
-      next: () => {
-        this.isTemplateSubmitting = false;
-        this.templateSuccess = this.editingMessage ? 'Template form updated successfully!' : 'Template form sent successfully!';
-        if (!this.editingMessage) form.resetForm();
-        setTimeout(() => this.showList(), 1500);
-      },
-      error: (err) => {
-        this.isTemplateSubmitting = false;
-        console.error('Error in template form:', err);
-      }
-    });
-  }
-
-  // Submit Reactive Form
   onSubmitReactive() {
     if (this.reactiveForm.invalid) return;
 
     this.isReactiveSubmitting = true;
     this.reactiveSuccess = '';
+    this.reactiveError = '';
 
-    const data: ContactMessage = this.reactiveForm.value;
+    const formValues = this.reactiveForm.value;
+    console.log(formValues);
     
-    const request$ = this.editingMessage && this.editingMessage.id
-      ? this.contactService.updateMessage(this.editingMessage.id, data)
-      : this.contactService.createMessage(data);
+    const formData = new FormData();
+    console.log(formData);
+    
+  
+    // Append all text fields
+    Object.keys(formValues).forEach(key => {
+      formData.append(key, formValues[key]);
+    });
 
-    request$.subscribe({
+    // Append the file if it exists
+    if (this.selectedFile) {
+      formData.append('attachment', this.selectedFile);
+    }
+
+    this.contactService.createMessage(formData).subscribe({
       next: () => {
         this.isReactiveSubmitting = false;
-        this.reactiveSuccess = this.editingMessage ? 'Reactive form updated successfully!' : 'Reactive form sent successfully!';
-        if (!this.editingMessage) this.reactiveForm.reset();
-        setTimeout(() => this.showList(), 1500);
+        this.reactiveSuccess = 'Your message has been sent successfully! Our support team will get back to you soon.';
+        this.reactiveForm.reset();
+        this.selectedFile = null;
       },
       error: (err) => {
         this.isReactiveSubmitting = false;
-        console.error('Error in reactive form:', err);
+        this.reactiveError = 'Failed to send message. Please try again.';
+        console.error('Error sending message:', err);
       }
     });
   }
