@@ -2,13 +2,13 @@ from rest_framework import generics, status
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from django.contrib.auth import authenticate, login
-from .models import CustomUser, Role
-from .serializers import UserSerializer, RoleSerializer
+from .models import CustomUser, Role, Team
+from .serializers import UserSerializer, RoleSerializer, TeamSerializer
 from rest_framework_simplejwt.tokens import RefreshToken
 
 from django.http import Http404
 
-from rest_framework.permissions import IsAuthenticated, IsAdminUser
+from rest_framework.permissions import IsAuthenticated, IsAdminUser, AllowAny
 
 from django.db.models import Q
 
@@ -27,40 +27,35 @@ class UserListCreateView(APIView):
         # 2. Extract the search and status query parameters from the URL
         search_query = request.query_params.get('search', None)
         status_query = request.query_params.get('status', None)
-        # status_query = Active  # Normalize to lowercase for case-insensitive comparison
         
+        # 3. If there is a search query, filter the users by name or email
         if search_query:
-            # 3. Filter using Q objects for OR logic
             users = users.filter(
-                Q(firstName__icontains=search_query) |
-                Q(lastName__icontains=search_query) |
+                Q(first_name__icontains=search_query) | 
+                Q(last_name__icontains=search_query) |
                 Q(email__icontains=search_query)
             )
             
-        if status_query:
-            users = users.filter(status__iexact=status_query)
-            
-        # 4. Convert complex model instances into JSON using the serializer (many=True for lists)
+        # 4. If there is a status query, filter by status
+        if status_query and status_query != 'All Statuses':
+            is_active_filter = True if status_query.lower() == 'active' else False
+            users = users.filter(is_active=is_active_filter)
+
+        # 5. Serialize the filtered data
         serializer = UserSerializer(users, many=True)
-        # 5. Return the JSON response
         return Response(serializer.data)
 
     def post(self, request):
-        # 1. Pass the incoming JSON data to the serializer
         serializer = UserSerializer(data=request.data)
-        # 2. Check if the data is valid according to our rules
         if serializer.is_valid():
-            # 3. Save to database
             serializer.save()
-            # 4. Return success response with 201 Created status
             return Response(serializer.data, status=status.HTTP_201_CREATED)
-        # 5. If invalid, return the errors with 400 Bad Request status
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class UserDetailView(APIView):
-    """
-    Explicitly showing GET, PUT, and DELETE methods for a specific user ID (pk).
-    """
+    # Protect this endpoint too!
+    permission_classes = [IsAuthenticated, IsAdminUser]
+    
     def get_object(self, pk):
         try:
             return CustomUser.objects.get(pk=pk)
@@ -74,7 +69,6 @@ class UserDetailView(APIView):
 
     def put(self, request, pk):
         user = self.get_object(pk)
-        # Pass the existing user and the new data to update it
         serializer = UserSerializer(user, data=request.data, partial=True)
         if serializer.is_valid():
             serializer.save()
@@ -92,11 +86,7 @@ class RoleListCreateView(generics.ListCreateAPIView):
 
 class RegisterView(APIView):
     def post(self, request):
-        # The angular app sends "name" for register, map it to firstName
-        data = request.data.copy()
-        if 'name' in data and 'firstName' not in data:
-            data['firstName'] = data['name']
-            
+        data = request.data
         serializer = UserSerializer(data=data)
         if serializer.is_valid():
             serializer.save()
@@ -107,22 +97,17 @@ class RegisterView(APIView):
 class LoginView(APIView):
     def post(self, request):
         email = request.data.get('email')
-        print(f"Login attempt for email: {email}")  # Debugging line
-        # deshmukhonkar29@gmail.com
         mobile = request.data.get('mobile')
-        print(f"Login attempt for mobile: {mobile}")  # Debugging line  
         password = request.data.get('password')
                 
         # Since USERNAME_FIELD is 'email', we authenticate using email
         user = authenticate(request, email=email,mobile=mobile, password=password)
-                # deshmukhonkar29@gmail.com=deshmukhnkar29@gmail.com
         
         if user is not None:
             login(request, user)
             
             # Generate JWT Tokens
             refresh = RefreshToken.for_user(user)
-            print("refresh", refresh)
             
             # Return both tokens and the user data to match Angular's new expectation
             return Response({
@@ -131,3 +116,28 @@ class LoginView(APIView):
                 'user': UserSerializer(user).data
             })
         return Response({'error': 'Invalid credentials'}, status=status.HTTP_401_UNAUTHORIZED)
+
+class LogoutView(APIView):
+    def post(self, request):
+        # We don't actually need to do much here since JWT tokens are stateless,
+        # but we provide this endpoint for the Angular frontend to call so it feels like a real logout
+        return Response({'message': 'Logged out perfectly!'}, status=status.HTTP_205_RESET_CONTENT)
+
+class TeamListCreateView(APIView):
+    """
+    Handles the dynamic FormArray example.
+    """
+    permission_classes = [AllowAny] # For demonstration purposes
+
+    def post(self, request):
+        # 1. Pass the nested JSON object from Angular to our new serializer
+        serializer = TeamSerializer(data=request.data)
+        
+        # 2. Validate it (this validates both the parent Team AND the array of TeamMembers)
+        if serializer.is_valid():
+            # 3. Save it (triggers the custom create() method in our serializer)
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+            
+        # 4. If invalid, return errors
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

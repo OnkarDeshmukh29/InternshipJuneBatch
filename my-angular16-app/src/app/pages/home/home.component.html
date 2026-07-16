@@ -1,44 +1,87 @@
-<div class="home-container">
-  <section class="hero">
-    <div class="hero-content">
-      <h1 class="title">Welcome to <span class="highlight">MyApp</span></h1>
-      <p class="subtitle">Experience a clean, modern, and beautifully designed user interface built with Angular and SCSS.</p>
-      <div class="cta-group">
-        <button class="btn btn-primary" routerLink="/contact-us">Get in Touch</button>
-        <button class="btn btn-secondary">Learn More</button>
+<div class="home-container" style="max-width: 1000px; margin: 40px auto; padding: 20px;">
+  <!-- Original Welcome Banner -->
+  <div class="welcome-banner" style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 60px;">
+    <div class="text-content" style="max-width: 500px;">
+      <h1 style="font-size: 3rem; margin-bottom: 20px;">Welcome to <span style="color: #6366f1;">MyApp</span></h1>
+      <p style="font-size: 1.1rem; color: #555; line-height: 1.6; margin-bottom: 30px;">
+        Experience a clean, modern, and beautifully designed user interface built with Angular and SCSS.
+      </p>
+      <div class="actions">
+        <a routerLink="/contact-us" class="btn btn-primary" style="background: #6366f1; color: white; padding: 12px 24px; border-radius: 6px; text-decoration: none; font-weight: 500; margin-right: 15px;">Get In Touch</a>
+        <a routerLink="/users" class="btn btn-outline" style="border: 2px solid #ddd; padding: 10px 24px; border-radius: 6px; text-decoration: none; font-weight: 500; color: #333;">Manage Users</a>
       </div>
     </div>
-    <div class="hero-image">
-      <div class="mockup-window">
-        <div class="window-header">
-          <span class="dot"></span>
-          <span class="dot"></span>
-          <span class="dot"></span>
+    <div class="image-content" style="flex: 1; display: flex; justify-content: flex-end;">
+      <div style="width: 400px; height: 300px; background: white; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); padding: 20px; border: 1px solid #eee;">
+        <div style="display: flex; gap: 8px; margin-bottom: 20px;">
+          <div style="width: 12px; height: 12px; border-radius: 50%; background: #ff5f56;"></div>
+          <div style="width: 12px; height: 12px; border-radius: 50%; background: #ffbd2e;"></div>
+          <div style="width: 12px; height: 12px; border-radius: 50%; background: #27c93f;"></div>
         </div>
-        <div class="window-body">
-          <div class="skeleton-line"></div>
-          <div class="skeleton-line short"></div>
-          <div class="skeleton-block"></div>
-        </div>
+        <div style="width: 100%; height: 20px; background: #f0f0f0; border-radius: 4px; margin-bottom: 10px;"></div>
+        <div style="width: 70%; height: 20px; background: #f0f0f0; border-radius: 4px; margin-bottom: 30px;"></div>
+        <div style="width: 100%; height: 120px; background: #fafafa; border-radius: 8px;"></div>
       </div>
     </div>
-  </section>
+  </div>
 
-  <section class="features">
-    <div class="feature-card">
-      <div class="icon">🚀</div>
-      <h3>Fast Performance</h3>
-      <p>Optimized for speed and efficiency, giving your users the best possible experience.</p>
+  <hr style="border: 0; border-top: 1px solid #eee; margin: 40px 0;">
+
+  <!-- FormArray Demonstration -->
+  <div class="form-array-demo">
+    <div style="text-align: center; margin-bottom: 40px;">
+      <h2 style="font-size: 2rem;">Dynamic FormArray Demonstration</h2>
+      <p style="color: #666;">Build a team! Add as many members as you want dynamically.</p>
     </div>
-    <div class="feature-card">
-      <div class="icon">🎨</div>
-      <h3>Modern Design</h3>
-      <p>Beautiful aesthetics with glassmorphism, micro-interactions, and smooth gradients.</p>
-    </div>
-    <div class="feature-card">
-      <div class="icon">📱</div>
-      <h3>Responsive</h3>
-      <p>Looks great on all devices, from large desktop monitors to small mobile screens.</p>
-    </div>
-  </section>
+
+    <form [formGroup]="teamForm" (ngSubmit)="onSubmit()" style="background: white; padding: 40px; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); border: 1px solid #eee;">
+      
+      <!-- Parent Fields -->
+      <div class="form-group" style="margin-bottom: 30px;">
+        <label for="teamName" style="display: block; font-weight: 500; margin-bottom: 8px;">Team Name</label>
+        <input type="text" id="teamName" formControlName="name" style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 1rem;" placeholder="e.g. Alpha Squad">
+      </div>
+
+      <!-- FormArray Fields -->
+      <div style="background: #fafafa; padding: 20px; border-radius: 8px; border: 1px solid #eaeaea; margin-bottom: 30px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+          <h3 style="margin: 0; font-size: 1.2rem;">Team Members ({{ members.length }})</h3>
+          <button type="button" (click)="addMember()" style="background: #10b981; color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer; font-weight: 500;">
+            + Add Member
+          </button>
+        </div>
+
+        <div formArrayName="members">
+          <!-- Loop through the controls array -->
+          <div *ngFor="let member of members.controls; let i=index" [formGroupName]="i" style="display: flex; gap: 15px; margin-bottom: 15px; align-items: flex-end;">
+            
+            <div style="flex: 1;">
+              <label *ngIf="i === 0" style="display: block; font-size: 0.85rem; color: #666; margin-bottom: 5px;">Member Name</label>
+              <input type="text" formControlName="name" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px;" placeholder="John Doe">
+            </div>
+
+            <div style="flex: 1;">
+              <label *ngIf="i === 0" style="display: block; font-size: 0.85rem; color: #666; margin-bottom: 5px;">Role</label>
+              <input type="text" formControlName="role" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px;" placeholder="Frontend Developer">
+            </div>
+
+            <!-- Remove Button -->
+            <button type="button" (click)="removeMember(i)" [disabled]="members.length === 1" style="background: #ef4444; color: white; border: none; padding: 10px 15px; border-radius: 4px; cursor: pointer; font-weight: bold; opacity: members.length === 1 ? '0.5' : '1';">
+              X
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Alerts -->
+      <div *ngIf="successMessage" style="background: #d1fae5; color: #065f46; padding: 15px; border-radius: 6px; margin-bottom: 20px;">{{ successMessage }}</div>
+      <div *ngIf="errorMessage" style="background: #fee2e2; color: #991b1b; padding: 15px; border-radius: 6px; margin-bottom: 20px;">{{ errorMessage }}</div>
+
+      <!-- Submit -->
+      <button type="submit" [disabled]="teamForm.invalid || isSubmitting" style="width: 100%; background: #6366f1; color: white; border: none; padding: 15px; border-radius: 6px; font-size: 1.1rem; font-weight: 600; cursor: pointer; opacity: teamForm.invalid ? '0.6' : '1';">
+        {{ isSubmitting ? 'Saving Team...' : 'Save Entire Team to Database' }}
+      </button>
+
+    </form>
+  </div>
 </div>

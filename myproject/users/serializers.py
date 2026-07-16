@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import CustomUser, Role
+from .models import CustomUser, Role, Team, TeamMember
 
 class RoleSerializer(serializers.ModelSerializer):
     class Meta:
@@ -38,3 +38,30 @@ class UserSerializer(serializers.ModelSerializer):
             user.set_password(password)
             user.save()
         return user
+
+class TeamMemberSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = TeamMember
+        fields = ['id', 'name', 'role']
+
+class TeamSerializer(serializers.ModelSerializer):
+    # This maps directly to the Angular FormArray!
+    members = TeamMemberSerializer(many=True)
+
+    class Meta:
+        model = Team
+        fields = ['id', 'name', 'members', 'created_at']
+
+    def create(self, validated_data):
+        # 1. Pop the array of members out of the validated data
+        members_data = validated_data.pop('members')
+        
+        # 2. Create the parent Team object
+        team = Team.objects.create(**validated_data)
+        
+        # 3. Loop through the array and create a TeamMember for each one, linking it to the parent
+        for member_data in members_data:
+            TeamMember.objects.create(team=team, **member_data)
+            
+        return team
+

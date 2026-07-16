@@ -94,6 +94,30 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
         return self.email
 
 
+class Team(models.Model):
+    """
+    Demonstrates the parent model for our FormArray example.
+    """
+    name = models.CharField(max_length=255)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.name
+
+class TeamMember(models.Model):
+    """
+    Demonstrates the child model in a One-To-Many relationship.
+    This corresponds directly to the items dynamically added to the Angular FormArray.
+    """
+    # related_name='members' allows us to fetch team.members.all()
+    team = models.ForeignKey(Team, related_name='members', on_delete=models.CASCADE)
+    name = models.CharField(max_length=255)
+    role = models.CharField(max_length=100)
+
+    def __str__(self):
+        return f"{self.name} ({self.role})"
+
+
 class permissions(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(max_length=50, unique=True) 
